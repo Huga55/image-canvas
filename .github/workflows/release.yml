@@ -33,6 +33,10 @@ jobs:
             echo "Версия $version уже опубликована"
             exit 0
           fi
+          if ! git ls-remote --exit-code --tags origin "refs/tags/v${version}" >/dev/null 2>&1; then
+            git tag "v${version}" "${GITHUB_SHA}"
+            git push origin "refs/tags/v${version}"
+          fi
           npx electron-vite build
           npx electron-builder --win --publish always
         env:
