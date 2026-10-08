@@ -91,6 +91,7 @@ export function CollageStudio({ photos, settings, saving, copying, restoring, on
       </div>
       {photos.length > 0 && <p className="hint stage-hint">Нажмите на коллаж, чтобы открыть на весь экран.</p>}
 
+      <div className="studio-scroll">
       <div className="check-row">
         <label className="check whole-photo">
           <input
@@ -303,6 +304,7 @@ export function CollageStudio({ photos, settings, saving, copying, restoring, on
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {ratioOpen && (

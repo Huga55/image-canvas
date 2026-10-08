@@ -129,19 +129,39 @@ button:disabled {
   font-size: 13px;
 }
 
-.banner {
-  margin: 0 0 12px;
-  padding: 8px 12px;
-  border-radius: 10px;
+.toast {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  z-index: 28;
+  margin: 0;
+  max-width: min(520px, calc(100% - 32px));
+  padding: 10px 16px;
+  border-radius: 12px;
   background: #fff7ed;
   color: #9a3412;
   border: 1px solid #fed7aa;
+  box-shadow: 0 14px 36px rgba(40, 32, 22, 0.18);
+  pointer-events: none;
+  animation: toast-in 180ms ease-out;
 }
 
-.banner.is-ok {
+.toast.is-ok {
   background: #ecfdf5;
   color: #065f46;
   border-color: #a7f3d0;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 }
 
 .workspace {
@@ -303,12 +323,24 @@ button:disabled {
 }
 
 .studio {
+  overflow: hidden;
+}
+
+.panel-head,
+.stage-hint {
+  flex-shrink: 0;
+}
+
+.studio-scroll {
+  flex: 0 1 auto;
+  min-height: 0;
   overflow: auto;
+  padding-right: 2px;
 }
 
 .stage {
-  flex: 1;
-  min-height: 220px;
+  flex: 1 0 0;
+  min-height: max(220px, 50%);
   border-radius: 14px;
   background: #e4dfd6;
   display: flex;
@@ -1001,5 +1033,9 @@ button:disabled {
 @media (prefers-reduced-motion: reduce) {
   * {
     scroll-behavior: auto !important;
+  }
+
+  .toast {
+    animation: none;
   }
 }

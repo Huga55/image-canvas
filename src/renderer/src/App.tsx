@@ -257,8 +257,8 @@ export default function App() {
   }, [addElectronClipboard, addFiles])
 
   useEffect(() => {
-    if (notice?.tone !== 'ok') return
-    const timer = window.setTimeout(() => setNotice(null), 4000)
+    if (!notice) return
+    const timer = window.setTimeout(() => setNotice(null), notice.tone === 'ok' ? 3200 : 5600)
     return () => window.clearTimeout(timer)
   }, [notice])
 
@@ -395,7 +395,7 @@ export default function App() {
       </header>
 
       {notice && (
-        <p className={notice.tone === 'ok' ? 'banner is-ok' : 'banner'} role="status" data-status>
+        <p key={`${notice.tone}:${notice.text}`} className={notice.tone === 'ok' ? 'toast is-ok' : 'toast'} role="status" data-status>
           {notice.text}
         </p>
       )}
