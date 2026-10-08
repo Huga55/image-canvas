@@ -10,6 +10,13 @@ win:
   icon: resources/icon.ico
   target:
     - nsis
+mac:
+  icon: resources/icon-1024.png
+  category: public.app-category.photography
+  artifactName: Holst-${version}-${arch}.${ext}
+  target:
+    - dmg
+    - zip
 nsis:
   oneClick: true
   perMachine: false
