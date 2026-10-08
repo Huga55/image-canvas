@@ -1,8 +1,8 @@
-export const APP_VERSION = '0.1.0'
+export const APP_VERSION = '0.2.0'
 
 export const CHANGELOG: { version: string; items: string[] }[] = [
   {
-    version: '0.1.0',
+    version: '0.2.0',
     items: [
       'Коллаж из своих фото, он остаётся на этом компьютере',
       'Соотношение сторон можно подобрать автоматически или задать своё',
