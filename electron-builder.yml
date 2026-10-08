@@ -1,0 +1,21 @@
+appId: app.holst.desktop
+productName: Холст
+executableName: holst
+directories:
+  output: release
+files:
+  - out
+  - package.json
+win:
+  icon: resources/icon.ico
+  target:
+    - nsis
+nsis:
+  oneClick: true
+  perMachine: false
+  artifactName: Holst-Setup-${version}.${ext}
+  shortcutName: Холст
+  uninstallDisplayName: Холст
+publish:
+  provider: github
+  releaseType: release
