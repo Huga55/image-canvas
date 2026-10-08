@@ -30,7 +30,8 @@ const initialSettings: CollageSettings = {
   gap: 10,
   fit: 'cover',
   background: '#ffffff',
-  longSide: EXPORT_LONG_SIDE
+  longSide: EXPORT_LONG_SIDE,
+  numbered: false
 }
 
 const presetIds = new Set<AspectId>(['16:9', '4:3', '1:1', '3:4', '9:16'])
@@ -70,7 +71,8 @@ function readSettings(value: unknown): CollageSettings | null {
     gap: item.gap,
     fit: item.fit,
     background: item.background,
-    longSide: typeof item.longSide === 'number' ? normalizeLongSide(item.longSide) : EXPORT_LONG_SIDE
+    longSide: typeof item.longSide === 'number' ? normalizeLongSide(item.longSide) : EXPORT_LONG_SIDE,
+    numbered: item.numbered === true
   }
 }
 
@@ -283,7 +285,8 @@ export default function App() {
       rows: grid.rows,
       gap: settings.gap,
       fit: settings.fit,
-      background: settings.background
+      background: settings.background,
+      numbered: settings.numbered
     })
   }
 

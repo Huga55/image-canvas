@@ -341,8 +341,14 @@ button:disabled {
   margin: 8px 2px 0;
 }
 
-.whole-photo {
+.check-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 12px;
+}
+
+.whole-photo {
   padding: 8px 10px;
   border-radius: 12px;
   background: #f7f4ee;
@@ -351,9 +357,28 @@ button:disabled {
 }
 
 .cell {
+  position: relative;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+}
+
+.cell-index {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(23, 51, 46, 0.86);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .cell img {

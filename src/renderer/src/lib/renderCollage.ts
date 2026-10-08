@@ -9,6 +9,7 @@ export type CollageRenderOptions = {
   gap: number
   fit: FitMode
   background: string
+  numbered: boolean
 }
 
 export function collageFileName(date = new Date()): string {
@@ -41,6 +42,7 @@ export async function renderCollage(photos: Photo[], options: CollageRenderOptio
     try {
       const rect = cellRect(index, options.cols, options.rows, width, height, gap)
       drawFit(context, bitmap, bitmap.width, bitmap.height, rect.x, rect.y, rect.w, rect.h, options.fit)
+      if (options.numbered) drawNumber(context, index + 1, rect.x, rect.y, rect.w, rect.h)
     } finally {
       bitmap.close()
     }
@@ -52,6 +54,27 @@ export async function renderCollage(photos: Photo[], options: CollageRenderOptio
       else reject(new Error('Не удалось собрать коллаж'))
     }, 'image/png')
   })
+}
+
+function drawNumber(context: CanvasRenderingContext2D, number: number, x: number, y: number, cellWidth: number, cellHeight: number): void {
+  const text = String(number)
+  const size = Math.max(18, Math.round(Math.min(cellWidth, cellHeight) * 0.16))
+  const fontSize = Math.round(size * 0.62)
+  context.save()
+  context.font = `700 ${fontSize}px "Segoe UI", system-ui, sans-serif`
+  const badgeWidth = Math.max(size, context.measureText(text).width + fontSize)
+  const inset = Math.round(size * 0.32)
+  const left = x + inset
+  const top = y + inset
+  context.beginPath()
+  context.roundRect(left, top, badgeWidth, size, size / 2)
+  context.fillStyle = 'rgba(23, 51, 46, 0.86)'
+  context.fill()
+  context.fillStyle = '#ffffff'
+  context.textAlign = 'center'
+  context.textBaseline = 'middle'
+  context.fillText(text, left + badgeWidth / 2, top + size / 2)
+  context.restore()
 }
 
 function cellRect(

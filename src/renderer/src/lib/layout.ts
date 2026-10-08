@@ -21,6 +21,7 @@ export type CollageSettings = {
   fit: FitMode
   background: string
   longSide: number
+  numbered: boolean
 }
 
 export const EXPORT_LONG_SIDE = 2400

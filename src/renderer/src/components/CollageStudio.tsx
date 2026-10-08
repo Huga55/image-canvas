@@ -88,14 +88,20 @@ export function CollageStudio({ photos, settings, saving, copying, restoring, on
       </div>
       {photos.length > 0 && <p className="hint stage-hint">Нажмите на коллаж, чтобы открыть на весь экран.</p>}
 
-      <label className="check whole-photo">
-        <input
-          type="checkbox"
-          checked={settings.fit === 'contain'}
-          onChange={(event) => onChange({ fit: event.target.checked ? 'contain' : 'cover' })}
-        />
-        <span>Показать фото целиком</span>
-      </label>
+      <div className="check-row">
+        <label className="check whole-photo">
+          <input
+            type="checkbox"
+            checked={settings.fit === 'contain'}
+            onChange={(event) => onChange({ fit: event.target.checked ? 'contain' : 'cover' })}
+          />
+          <span>Показать фото целиком</span>
+        </label>
+        <label className="check whole-photo">
+          <input type="checkbox" checked={settings.numbered} onChange={(event) => onChange({ numbered: event.target.checked })} />
+          <span>Порядковые номера</span>
+        </label>
+      </div>
       <p className="hint fit-hint">
         {settings.fit === 'contain' ? 'Фото не обрезаются. Свободное место в ячейке закрывает фон.' : 'Фото заполняет ячейку, лишнее по краям обрезается.'}
       </p>
@@ -304,9 +310,10 @@ function CollageFrame({
         gridTemplateRows: `repeat(${grid.rows}, minmax(0, 1fr))`
       }}
     >
-      {photos.map((photo) => (
+      {photos.map((photo, index) => (
         <div key={photo.id} className="cell">
           <img src={photo.fullUrl} alt="" draggable={false} style={{ objectFit: settings.fit }} />
+          {settings.numbered && <span className="cell-index">{index + 1}</span>}
         </div>
       ))}
     </div>
