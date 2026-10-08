@@ -9,6 +9,15 @@ export const ASPECTS = [
 export type AspectId = (typeof ASPECTS)[number]['id'] | 'custom' | 'auto'
 export type GridMode = 'auto' | 'manual'
 export type FitMode = 'cover' | 'contain'
+export type WatermarkKind = 'lattice' | 'text' | 'center' | 'corner'
+export type WatermarkTone = 'light' | 'dark'
+
+export const WATERMARK_KINDS: { id: WatermarkKind; label: string }[] = [
+  { id: 'lattice', label: 'Решётка' },
+  { id: 'text', label: 'Текст' },
+  { id: 'center', label: 'Центр' },
+  { id: 'corner', label: 'Угол' }
+]
 
 export type CollageSettings = {
   aspectId: AspectId
@@ -22,6 +31,21 @@ export type CollageSettings = {
   background: string
   longSide: number
   numbered: boolean
+  watermark: boolean
+  watermarkKind: WatermarkKind
+  watermarkText: string
+  watermarkOpacity: number
+  watermarkTone: WatermarkTone
+}
+
+export function watermarkKind(value: unknown): WatermarkKind {
+  return WATERMARK_KINDS.some((item) => item.id === value) ? (value as WatermarkKind) : 'lattice'
+}
+
+export function watermarkOpacity(value: unknown): number {
+  const number = typeof value === 'number' ? value : 40
+  if (!Number.isFinite(number)) return 40
+  return Math.min(75, Math.max(8, Math.round(number)))
 }
 
 export const EXPORT_LONG_SIDE = 2400

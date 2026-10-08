@@ -11,11 +11,14 @@ import {
   exportSize,
   normalizeLongSide,
   resolveGrid,
+  WATERMARK_KINDS,
   type CollageSettings,
   type Grid,
-  type GridMode
+  type GridMode,
+  type WatermarkTone
 } from '../lib/layout'
 import type { Photo } from '../lib/photos'
+import { drawWatermark } from '../lib/watermark'
 
 const BACKGROUNDS = ['#ffffff', '#f4f1ea', '#d6d3d1', '#1c1917']
 
@@ -101,7 +104,65 @@ export function CollageStudio({ photos, settings, saving, copying, restoring, on
           <input type="checkbox" checked={settings.numbered} onChange={(event) => onChange({ numbered: event.target.checked })} />
           <span>Порядковые номера</span>
         </label>
+        <label className="check whole-photo">
+          <input type="checkbox" checked={settings.watermark} onChange={(event) => onChange({ watermark: event.target.checked })} />
+          <span>Вотермарка</span>
+        </label>
       </div>
+      {settings.watermark && (
+        <div className="watermark-box">
+          <div className="segmented watermark-kinds" role="radiogroup" aria-label="Тип вотермарки">
+            {WATERMARK_KINDS.map((kind) => (
+              <button
+                key={kind.id}
+                type="button"
+                role="radio"
+                aria-checked={settings.watermarkKind === kind.id}
+                className={settings.watermarkKind === kind.id ? 'is-selected' : ''}
+                onClick={() => onChange({ watermarkKind: kind.id })}
+              >
+                {kind.label}
+              </button>
+            ))}
+          </div>
+          {settings.watermarkKind !== 'lattice' && (
+            <label className="watermark-text">
+              <span className="control-label">Надпись</span>
+              <input
+                type="text"
+                maxLength={48}
+                value={settings.watermarkText}
+                placeholder="Холст"
+                onChange={(event) => onChange({ watermarkText: event.target.value.slice(0, 48) })}
+              />
+            </label>
+          )}
+          <div className="watermark-tune">
+            <label className="slider">
+              <span className="control-label">Прозрачность</span>
+              <input
+                type="range"
+                min={8}
+                max={75}
+                step={1}
+                value={settings.watermarkOpacity}
+                onChange={(event) => onChange({ watermarkOpacity: Number(event.target.value) })}
+              />
+            </label>
+            <div>
+              <span className="control-label">Цвет</span>
+              <div className="segmented" role="radiogroup" aria-label="Цвет вотермарки">
+                <ToneButton tone="light" current={settings.watermarkTone} onSelect={(watermarkTone) => onChange({ watermarkTone })}>
+                  Светлый
+                </ToneButton>
+                <ToneButton tone="dark" current={settings.watermarkTone} onSelect={(watermarkTone) => onChange({ watermarkTone })}>
+                  Тёмный
+                </ToneButton>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <p className="hint fit-hint">
         {settings.fit === 'contain' ? 'Фото не обрезаются. Свободное место в ячейке закрывает фон.' : 'Фото заполняет ячейку, лишнее по краям обрезается.'}
       </p>
@@ -316,6 +377,7 @@ function CollageFrame({
           {settings.numbered && <span className="cell-index">{index + 1}</span>}
         </div>
       ))}
+      {settings.watermark && <WatermarkCanvas width={width} height={height} settings={settings} />}
     </div>
   )
 }
@@ -405,6 +467,42 @@ function LongSideField({ value, onChange }: { value: number; onChange: (value: n
       <span>px</span>
     </label>
   )
+}
+
+function ToneButton({
+  tone,
+  current,
+  onSelect,
+  children
+}: {
+  tone: WatermarkTone
+  current: WatermarkTone
+  onSelect: (tone: WatermarkTone) => void
+  children: string
+}) {
+  return (
+    <button type="button" role="radio" aria-checked={current === tone} className={current === tone ? 'is-selected' : ''} onClick={() => onSelect(tone)}>
+      {children}
+    </button>
+  )
+}
+
+function WatermarkCanvas({ width, height, settings }: { width: number; height: number; settings: CollageSettings }) {
+  const ref = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = ref.current
+    if (!canvas) return
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    canvas.width = Math.max(1, Math.round(width * dpr))
+    canvas.height = Math.max(1, Math.round(height * dpr))
+    const context = canvas.getContext('2d')
+    if (!context) return
+    context.setTransform(dpr, 0, 0, dpr, 0, 0)
+    drawWatermark(context, width, height, settings)
+  }, [width, height, settings])
+
+  return <canvas ref={ref} className="watermark" aria-hidden="true" />
 }
 
 function ModeButton({

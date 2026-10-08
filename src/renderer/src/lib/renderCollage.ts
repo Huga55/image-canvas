@@ -1,5 +1,6 @@
-import { exportSize, type FitMode } from './layout'
+import { exportSize, type FitMode, type WatermarkKind, type WatermarkTone } from './layout'
 import type { Photo } from './photos'
+import { drawWatermark } from './watermark'
 
 export type CollageRenderOptions = {
   ratio: number
@@ -10,6 +11,11 @@ export type CollageRenderOptions = {
   fit: FitMode
   background: string
   numbered: boolean
+  watermark: boolean
+  watermarkKind: WatermarkKind
+  watermarkText: string
+  watermarkOpacity: number
+  watermarkTone: WatermarkTone
 }
 
 export function collageFileName(date = new Date()): string {
@@ -46,6 +52,10 @@ export async function renderCollage(photos: Photo[], options: CollageRenderOptio
     } finally {
       bitmap.close()
     }
+  }
+
+  if (options.watermark) {
+    drawWatermark(context, width, height, options)
   }
 
   return await new Promise<Blob>((resolve, reject) => {

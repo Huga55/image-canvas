@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { autoGrid, averagePhotoRatio, chooseAspect, exportSize, resolveGrid } from '../src/renderer/src/lib/layout.ts'
+import { autoGrid, averagePhotoRatio, chooseAspect, exportSize, resolveGrid, watermarkKind, watermarkOpacity } from '../src/renderer/src/lib/layout.ts'
 
 test('export size follows the long side and keeps the ratio', () => {
   assert.deepEqual(exportSize(16 / 9), { width: 2400, height: 1350 })
@@ -62,6 +62,14 @@ test('showing photos whole can pick a different ratio than filling the cell', ()
   const cover = chooseAspect(photos, { ...base, fit: 'cover' })
   const contain = chooseAspect(photos, { ...base, fit: 'contain' })
   assert.notEqual(cover.id, contain.id)
+})
+
+test('watermark settings fall back to a lattice', () => {
+  assert.equal(watermarkKind('nope'), 'lattice')
+  assert.equal(watermarkKind('corner'), 'corner')
+  assert.equal(watermarkOpacity('много'), 40)
+  assert.equal(watermarkOpacity(2), 8)
+  assert.equal(watermarkOpacity(90), 75)
 })
 
 test('average ratio uses the geometric mean', () => {

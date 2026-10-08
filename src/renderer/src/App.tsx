@@ -11,6 +11,8 @@ import {
   resolveCanvas,
   normalizeLongSide,
   resolveGrid,
+  watermarkKind,
+  watermarkOpacity,
   type AspectId,
   type CollageSettings,
   type GridMode
@@ -31,7 +33,12 @@ const initialSettings: CollageSettings = {
   fit: 'cover',
   background: '#ffffff',
   longSide: EXPORT_LONG_SIDE,
-  numbered: false
+  numbered: false,
+  watermark: false,
+  watermarkKind: 'lattice',
+  watermarkText: 'Холст',
+  watermarkOpacity: 40,
+  watermarkTone: 'light'
 }
 
 const presetIds = new Set<AspectId>(['16:9', '4:3', '1:1', '3:4', '9:16'])
@@ -72,7 +79,12 @@ function readSettings(value: unknown): CollageSettings | null {
     fit: item.fit,
     background: item.background,
     longSide: typeof item.longSide === 'number' ? normalizeLongSide(item.longSide) : EXPORT_LONG_SIDE,
-    numbered: item.numbered === true
+    numbered: item.numbered === true,
+    watermark: item.watermark === true,
+    watermarkKind: watermarkKind(item.watermarkKind),
+    watermarkText: typeof item.watermarkText === 'string' ? item.watermarkText.slice(0, 48) : 'Холст',
+    watermarkOpacity: watermarkOpacity(item.watermarkOpacity),
+    watermarkTone: item.watermarkTone === 'dark' ? 'dark' : 'light'
   }
 }
 
@@ -286,7 +298,12 @@ export default function App() {
       gap: settings.gap,
       fit: settings.fit,
       background: settings.background,
-      numbered: settings.numbered
+      numbered: settings.numbered,
+      watermark: settings.watermark,
+      watermarkKind: settings.watermarkKind,
+      watermarkText: settings.watermarkText,
+      watermarkOpacity: settings.watermarkOpacity,
+      watermarkTone: settings.watermarkTone
     })
   }
 
