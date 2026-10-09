@@ -21,13 +21,28 @@ jobs:
         shell: bash
         run: |
           version=$(node -p "require('./package.json').version")
-          code=$(curl -s -o /dev/null -w "%{http_code}" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          response=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/releases/tags/v${version}")
+          code=$(printf '%s' "$response" | tail -n 1)
+          body=$(printf '%s' "$response" | sed '$d')
           if [ "$code" = "200" ]; then
-            echo "publish=false" >> "$GITHUB_OUTPUT"
-            echo "Версия $version уже опубликована"
+            missing=$(BODY="$body" VERSION="$version" node -e '
+              const release = JSON.parse(process.env.BODY)
+              const names = (release.assets || []).map((asset) => asset.name)
+              const required = ["Holst-Setup-" + process.env.VERSION + ".exe", "latest.yml", "latest-mac.yml"]
+              const absent = required.filter((name) => !names.includes(name))
+              if (!names.some((name) => name.endsWith(".dmg"))) absent.push("dmg")
+              process.stdout.write(String(absent.length))
+            ')
+            if [ "$missing" = "0" ]; then
+              echo "publish=false" >> "$GITHUB_OUTPUT"
+              echo "Версия $version уже опубликована"
+              exit 0
+            fi
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "В релизе v${version} не хватает файлов, загружаем ещё раз"
             exit 0
           fi
           echo "publish=true" >> "$GITHUB_OUTPUT"
@@ -35,6 +50,11 @@ jobs:
             git tag "v${version}" "${GITHUB_SHA}"
             git push origin "refs/tags/v${version}"
           fi
+          curl -sS -f -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases" \
+            -d "{\"tag_name\":\"v${version}\",\"target_commitish\":\"${GITHUB_SHA}\",\"name\":\"v${version}\",\"draft\":false,\"prerelease\":false}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
